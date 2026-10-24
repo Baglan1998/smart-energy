@@ -42,7 +42,31 @@
             <small>Нагрузка <b id="homeLoadPercent">0</b>%</small>
           </div>
         </div>
+<!-- Мониторинг ESP32 -->
+<section class="esp32-panel">
+  <h2>📡 ESP32 — мониторинг датчиков</h2>
 
+  <div class="esp32-readings">
+    <div>
+      <strong id="espTemperature">—</strong>
+      <span>°C</span>
+      <p>🌡️ Температура</p>
+    </div>
+
+    <div>
+      <strong id="espHumidity">—</strong>
+      <span>%</span>
+      <p>💧 Влажность</p>
+    </div>
+
+    <div>
+      <strong id="espMotion">—</strong>
+      <p>🚶 Движение</p>
+    </div>
+  </div>
+
+  <p id="espStatus">⏳ Подключение к Firebase...</p>
+</section>
         <dl class="home-readings" aria-live="polite">
           <div><dd><span id="homeVoltage">230.0</span> В</dd><dt>Напряжение</dt></div>
           <div><dd><span id="homeCurrent">0.00</span> А</dd><dt>Ток</dt></div>
@@ -435,6 +459,6 @@
   <script src="lib/calculations.js?v=20261014-1"></script>
   <script src="lib/measurement-model.js?v=20261018-1"></script>
   <script src="services/real-device-api.js?v=20261018-1"></script>
-  <script src="script.js?v=20261018-1"></script>
+  <script src="script.js?v=20261025-1"></script>
 </body>
 </html>

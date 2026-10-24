@@ -4034,3 +4034,44 @@ if (window.__SMART_ENERGY_TEST__) {
 } else {
   initializeDashboard();
 }
+// SMART ENERGY — ESP32 Firebase
+const ESP32_DATABASE_URL =
+  "https://smart-energy-esp32-default-rtdb.europe-west1.firebasedatabase.app";
+
+async function updateESP32() {
+  const status = document.getElementById("espStatus");
+
+  try {
+    const response = await fetch(
+      `${ESP32_DATABASE_URL}/sensors.json`,
+      { cache: "no-store" }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Firebase HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data) {
+      throw new Error("Данные датчиков пока отсутствуют");
+    }
+
+    document.getElementById("espTemperature").textContent =
+      Number(data.temperature).toFixed(1);
+
+    document.getElementById("espHumidity").textContent =
+      Number(data.humidity).toFixed(1);
+
+    document.getElementById("espMotion").textContent =
+      data.motion ? "Есть" : "Нет";
+
+    status.textContent = "🟢 Firebase подключён";
+  } catch (error) {
+    status.textContent = "🔴 Ошибка: " + error.message;
+    console.error("ESP32:", error);
+  }
+}
+
+updateESP32();
+setInterval(updateESP32, 3000);

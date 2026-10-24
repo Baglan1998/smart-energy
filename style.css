@@ -1580,3 +1580,56 @@ body > header:not(.topbar) nav { display: flex; gap: 4px; }
   .rastr-model-capabilities > div { grid-template-columns: 1fr; gap: 4px; }
   .rastr-region-summary { grid-template-columns: 1fr; }
 }
+/* SMART ENERGY — ESP32 */
+.esp32-panel {
+  margin: 24px auto;
+  padding: 24px;
+  max-width: 900px;
+  background: #111e30;
+  border: 1px solid #263a53;
+  border-radius: 18px;
+  color: #f1f5f9;
+  text-align: center;
+}
+
+.esp32-panel h2 {
+  font-size: 22px;
+  margin: 0 0 24px;
+}
+
+.esp32-readings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.esp32-readings > div {
+  padding: 20px 12px;
+  background: #192b42;
+  border-radius: 14px;
+}
+
+.esp32-readings strong {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.esp32-readings p {
+  font-size: 14px;
+  margin: 12px 0 0;
+}
+
+#espStatus {
+  margin: 20px 0 0;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .esp32-readings {
+    grid-template-columns: 1fr;
+  }
+
+  .esp32-panel {
+    padding: 16px;
+  }
+}
