@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="description" content="SMART ENERGY — учебная панель мониторинга параметров электрической сети">
+  <title>SMART ENERGY — мониторинг электроэнергии</title>
+  <link rel="stylesheet" href="style.css?v=20261016-1">
+</head>
+<body data-active-source="simulator">
+  <header class="topbar">
+    <a class="brand" href="#home" data-app-target="home" aria-label="SMART ENERGY — главная">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4.8 13h6.4L11 22l8.2-11h-6.4L13 2Z"></path></svg></span>
+      <span>SMART ENERGY</span>
+    </a>
+
+    <div class="topbar-actions">
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Переключить тему" title="Переключить тему">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="home-screen" id="home" data-app-page="home" aria-labelledby="homeTitle">
+      <div class="home-shell">
+        <div class="home-intro">
+          <p class="home-kicker">Energy Control Center</p>
+          <h1 id="homeTitle">SMART ENERGY</h1>
+          <p class="home-system-status" id="homeSystemStatus" data-status="normal"><i></i><span>СИСТЕМА В НОРМЕ</span></p>
+        </div>
+
+        <div class="home-power-ring" aria-label="Текущая активная мощность и загрузка главного ввода">
+          <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
+            <circle class="home-ring-track" cx="120" cy="120" r="104"></circle>
+            <circle class="home-ring-value" id="homePowerRing" cx="120" cy="120" r="104" pathLength="100"></circle>
+          </svg>
+          <div class="home-power-value">
+            <strong id="homeActivePower">0.00</strong>
+            <span>кВт</span>
+            <small>Нагрузка <b id="homeLoadPercent">0</b>%</small>
+          </div>
+        </div>
+
+        <dl class="home-readings" aria-live="polite">
+          <div><dd><span id="homeVoltage">230.0</span> В</dd><dt>Напряжение</dt></div>
+          <div><dd><span id="homeCurrent">0.00</span> А</dd><dt>Ток</dt></div>
+          <div><dd id="homePowerFactor">1.00</dd><dt>cosφ</dt></div>
+          <div><dd><span id="homeFrequency">50.00</span> Гц</dd><dt>Частота</dt></div>
+          <div class="home-energy-reading"><dd><span id="homeEnergy">0.000</span> кВт·ч</dd><dt>Энергия</dt></div>
+        </dl>
+
+        <div class="home-last-event">
+          <span>Последнее событие</span>
+          <strong id="homeLastEvent">Событий пока нет</strong>
+        </div>
+
+        <button class="home-equipment-alert" id="homeEquipmentAlert" type="button" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"></path><path d="M12 9v4m0 3h.01"></path></svg>
+          <span id="homeEquipmentAlertText"></span>
+        </button>
+
+        <div class="home-actions">
+          <button class="button button-primary" type="button" data-app-target="monitoring">Открыть мониторинг</button>
+          <button class="home-problem-action" id="homeProblemAction" type="button" hidden>Открыть EnergyLab</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero section-shell" id="dashboard" data-app-page="monitoring" hidden>
+      <div>
+        <p class="eyebrow" id="monitoringEyebrow">SIMULATION · учебная модель</p>
+        <h1 id="monitoringTitle">Мониторинг электроэнергии</h1>
+        <p class="hero-text" id="monitoringDescription">Расчётные данные симулятора — не реальные измерения.</p>
+      </div>
+      <div class="monitor-toolbar">
+        <div class="source-switch" role="radiogroup" aria-label="Источник данных">
+          <label><input type="radio" name="dataSource" value="simulator" checked><span>🧪 SIMULATION</span></label>
+          <label><input type="radio" name="dataSource" value="real"><span>🟢 REAL</span></label>
+        </div>
+        <p class="source-message" id="sourceMessage">Источник: Симуляция. Значения рассчитываются по включённым учебным нагрузкам.</p>
+        <div class="monitor-controls" aria-label="Управление мониторингом">
+          <button class="button button-primary" id="startMonitoring" type="button">
+            <span aria-hidden="true">▶</span> Запустить мониторинг
+          </button>
+          <button class="button button-secondary" id="stopMonitoring" type="button" disabled>
+            <span aria-hidden="true">■</span> Остановить мониторинг
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell real-device-panel" data-app-page="monitoring" data-real-only aria-labelledby="realMonitoringTitle" hidden>
+      <article class="panel real-device-summary">
+        <div>
+          <p class="eyebrow">REAL · READ ONLY</p>
+          <h2 id="realMonitoringTitle">REAL MONITORING</h2>
+          <p class="real-object">Объект: <strong>Домашний электрощит</strong></p>
+        </div>
+        <dl class="real-connection-details">
+          <div><dt>Статус устройства</dt><dd id="realConnectionStatus" class="real-status is-offline">🔴 OFFLINE</dd></div>
+          <div><dt>Последнее обновление</dt><dd id="realLastUpdated">—</dd></div>
+        </dl>
+        <p class="real-device-note" id="realDeviceNote">Реальное устройство ещё не подключено. Показания не генерируются.</p>
+      </article>
+    </section>
+
+    <section class="section-shell" data-app-page="monitoring" aria-labelledby="measurementsTitle" hidden>
+      <div class="section-heading-row">
+        <div>
+          <p class="eyebrow">Текущие параметры</p>
+          <h2 id="measurementsTitle">Параметры сети</h2>
+        </div>
+        <span class="update-state" id="updateState">Симуляция остановлена</span>
+      </div>
+
+      <div class="metrics-grid" aria-live="polite">
+        <article class="metric-card metric-voltage">
+          <div class="metric-icon" aria-hidden="true">U</div>
+          <p class="metric-label">Напряжение</p>
+          <p class="metric-value"><span id="voltageValue">220</span><span class="metric-unit">В</span></p>
+          <p class="metric-note">Фазное напряжение</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">I</div>
+          <p class="metric-label">Ток</p>
+          <p class="metric-value"><span id="currentValue">5.2</span><span class="metric-unit">А</span></p>
+          <p class="metric-note">Суммарная нагрузка</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">P</div>
+          <p class="metric-label">Активная мощность</p>
+          <p class="metric-value"><span id="activePowerValue">1.14</span><span class="metric-unit">кВт</span></p>
+          <p class="metric-note">Полезная мощность</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">Q</div>
+          <p class="metric-label">Реактивная мощность</p>
+          <p class="metric-value"><span id="reactivePowerValue">0.32</span><span class="metric-unit">квар</span></p>
+          <p class="metric-note">Обмен с сетью</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">S</div>
+          <p class="metric-label">Полная мощность</p>
+          <p class="metric-value"><span id="apparentPowerValue">1.18</span><span class="metric-unit">кВА</span></p>
+          <p class="metric-note">Полная нагрузка</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">φ</div>
+          <p class="metric-label">Коэффициент мощности</p>
+          <p class="metric-value metric-value-compact">cosφ = <span id="powerFactorValue">0.96</span></p>
+          <p class="metric-note">Отношение P к S</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">ƒ</div>
+          <p class="metric-label">Частота</p>
+          <p class="metric-value"><span id="frequencyValue">50.00</span><span class="metric-unit">Гц</span></p>
+          <p class="metric-note">Частота сети</p>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon" aria-hidden="true">E</div>
+          <p class="metric-label">Энергия</p>
+          <p class="metric-value"><span id="energyValue">8.400</span><span class="metric-unit">кВт·ч</span></p>
+          <p class="metric-note">Демонстрационный учёт</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-shell overview-grid" data-app-page="monitoring" data-simulation-only aria-label="Состояние и потребление" hidden>
+      <article class="panel status-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Диагностика</p>
+          <h2>Состояние нагрузки</h2>
+          </div>
+          <div class="status-badge status-normal" id="networkStatusBadge">
+            <span class="status-dot"></span>
+            <span id="networkStatusText">НОРМА</span>
+          </div>
+        </div>
+        <div class="status-reading">
+          <span>Текущий ток</span>
+          <strong><span id="statusCurrent">0.00</span> А</strong>
+        </div>
+        <p class="status-message" id="networkStatusMessage">Ток находится в демонстрационном нормальном диапазоне.</p>
+        <div class="threshold-scale" aria-hidden="true">
+          <span class="threshold-normal"></span>
+          <span class="threshold-warning"></span>
+          <span class="threshold-danger"></span>
+          <i id="thresholdMarker"></i>
+        </div>
+        <p class="panel-footnote">Демонстрационные пороги симулятора: до 13 А — норма, 13–16 А — внимание, выше 16 А — перегрузка. Это не универсальные нормативные значения.</p>
+      </article>
+
+      <article class="panel consumption-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Учёт энергии</p>
+            <h2>Потребление сегодня</h2>
+          </div>
+          <span class="consumption-main"><span id="consumptionValue">8.4</span> кВт·ч</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="Потребление относительно демонстрационной цели" aria-valuemin="0" aria-valuemax="100" aria-valuenow="56" id="consumptionProgress">
+          <span id="consumptionProgressFill"></span>
+        </div>
+        <div class="consumption-meta">
+          <span id="consumptionCaption">56% от демонстрационной цели 15 кВт·ч</span>
+          <span id="consumptionRemaining">Осталось 6.6 кВт·ч</span>
+        </div>
+        <div class="period-tabs" role="tablist" aria-label="Период потребления">
+          <button class="period-tab active" type="button" data-period="today" role="tab" aria-selected="true">Сегодня</button>
+          <button class="period-tab" type="button" data-period="week" role="tab" aria-selected="false">Неделя</button>
+          <button class="period-tab" type="button" data-period="month" role="tab" aria-selected="false">Месяц</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="section-shell" data-app-page="monitoring" data-simulation-only hidden>
+      <article class="panel chart-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Последние 30 измерений</p>
+            <h2 id="chartTitle">Напряжение в реальном времени</h2>
+          </div>
+          <div class="chart-tools">
+            <span class="chart-tools-label">Показатель</span>
+            <div class="chart-metric-tabs" id="chartMetric" role="group" aria-label="Показатель графика">
+              <button type="button" data-chart-metric="voltage" aria-pressed="true">Напряжение</button>
+              <button type="button" data-chart-metric="current" aria-pressed="false">Ток</button>
+              <button type="button" data-chart-metric="power" aria-pressed="false">Мощность</button>
+            </div>
+            <div class="chart-legend"><span></span><b id="chartLegendLabel">Напряжение, В</b></div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="voltageChart" aria-label="График последних измерений напряжения"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <section class="section-shell energylab-section" id="energy-lab" data-app-page="energy-lab" hidden>
+      <div id="energyLabHome">
+        <div class="section-heading-row energylab-heading">
+          <div>
+            <p class="eyebrow">Единая модель электрической сети</p>
+            <h2>⚡ EnergyLab</h2>
+            <p class="section-description">Моделирование и анализ электрических сетей</p>
+          </div>
+          <span class="local-mode-badge">Учебный режим</span>
+        </div>
+
+        <article class="panel energylab-summary">
+          <div>
+            <p class="eyebrow">Текущее состояние</p>
+            <h3>⚡ Сводка сети</h3>
+            <p class="energylab-summary-status" id="energyLabSummaryStatus">🟢 СИСТЕМА В НОРМЕ</p>
+          </div>
+          <dl class="energylab-summary-grid">
+            <div><dt>Напряжение</dt><dd><span id="energyLabVoltage">230.0</span> В</dd></div>
+            <div><dt>Ток</dt><dd><span id="energyLabCurrent">0.00</span> А</dd></div>
+            <div><dt>Мощность</dt><dd><span id="energyLabPower">0.00</span> кВт</dd></div>
+            <div><dt>cosφ</dt><dd id="energyLabPowerFactor">1.00</dd></div>
+            <div><dt>Частота</dt><dd><span id="energyLabFrequency">50.00</span> Гц</dd></div>
+          </dl>
+        </article>
+
+        <div class="energylab-quick-actions" aria-label="Быстрые действия EnergyLab">
+          <strong>Быстрые действия</strong>
+          <button type="button" data-energy-quick="add-load">+ Добавить нагрузку</button>
+          <button type="button" data-energy-quick="emergency">⚠ Аварийный режим</button>
+          <button type="button" data-energy-quick="three-phase">3~ Перейти на 3 фазы</button>
+          <button type="button" data-energy-quick="analysis">📊 Открыть анализ</button>
+        </div>
+
+        <div class="calculators-grid energylab-grid">
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="single-line"><span class="calculator-icon">🔌</span><h3>Однолинейная схема</h3><p>Построение и просмотр электрической сети</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="home"><span class="calculator-icon">🏠</span><h3>Симулятор дома</h3><p>Линии, комнаты и электрические нагрузки</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="breakers"><span class="calculator-icon">🛡</span><h3>Автоматы</h3><p>Автоматические выключатели и защита</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="loads"><span class="calculator-icon">⚡</span><h3>Нагрузки</h3><p>Управление приборами и своими нагрузками</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="three-phase"><span class="calculator-icon">3~</span><h3>Трёхфазная сеть</h3><p>Распределение нагрузок по L1 / L2 / L3 / N</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="phase-balance"><span class="calculator-icon">⚖</span><h3>Баланс фаз</h3><p>Анализ нагрузки L1, L2 и L3</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="emergency"><span class="calculator-icon">⚠</span><h3>Аварийные режимы</h3><p>Перегрузка, U↓, U↑ и низкий cosφ</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="analysis"><span class="calculator-icon">📊</span><h3>Анализ сети</h3><p>U, I, P, Q, S, cosφ и графики</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="line"><span class="calculator-icon">🔧</span><h3>Параметры линии</h3><p>Кабель, длина, сечение и падение напряжения</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="events"><span class="calculator-icon">📋</span><h3>Журнал событий</h3><p>Аварии, переключения и действия пользователя</p><span class="card-link">Открыть →</span></button>
+          <button class="calculator-card energylab-card" type="button" data-energy-tool="equipment"><span class="calculator-icon">⚙</span><h3>Оборудование</h3><p>Цифровые паспорта, измерения и обслуживание</p><span class="card-link">Открыть →</span></button>
+        </div>
+      </div>
+
+      <div class="energylab-tool" id="energyLabTool" hidden>
+        <button class="breadcrumb energylab-back" id="energyLabBack" type="button">← Назад к EnergyLab</button>
+        <div class="energylab-tool-header"><p class="eyebrow">EnergyLab</p><h2 id="energyLabToolTitle"></h2></div>
+        <div id="energyLabToolContent"></div>
+      </div>
+    </section>
+
+    <section class="section-shell systems-grid" id="diagram" data-app-page="monitoring" data-simulation-only hidden>
+      <article class="panel diagram-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Однолинейное представление</p>
+            <h2>Схема электроснабжения</h2>
+          </div>
+          <div class="diagram-legend">
+            <span><i class="legend-dot on"></i>Включена</span>
+            <span><i class="legend-dot off"></i>Отключена</span>
+            <span><i class="legend-dot fault"></i>Авария</span>
+          </div>
+        </div>
+
+        <div class="single-line-diagram">
+          <div class="diagram-node source-node"><span class="node-icon">⚡</span><div><strong>Энергосистема</strong><small>Источник питания</small></div><i class="line-state on"></i></div>
+          <div class="diagram-link active"></div>
+          <div class="diagram-node"><span class="node-icon">IN</span><div><strong>Ввод сети</strong><small>220 В · 50 Гц</small></div><i class="line-state on"></i></div>
+          <div class="diagram-link active"></div>
+          <div class="diagram-node"><span class="node-icon">kWh</span><div><strong>Счётчик</strong><small>Учёт электроэнергии</small></div><i class="line-state on"></i></div>
+          <div class="diagram-link active"></div>
+          <div class="diagram-node"><span class="node-icon">QF</span><div><strong>Главный автомат</strong><small>Распределение нагрузки</small></div><i class="line-state on"></i></div>
+          <div class="branch-bus"></div>
+          <div class="diagram-branches">
+            <div class="diagram-branch active" id="diagram-lighting"><span class="branch-line"></span><div class="branch-load"><i class="line-state on"></i><span>💡</span><strong>Освещение</strong><small>Линия включена</small></div></div>
+            <div class="diagram-branch active" id="diagram-computer"><span class="branch-line"></span><div class="branch-load"><i class="line-state on"></i><span>💻</span><strong>Компьютер</strong><small>Линия включена</small></div></div>
+            <div class="diagram-branch active" id="diagram-television"><span class="branch-line"></span><div class="branch-load"><i class="line-state on"></i><span>📺</span><strong>Телевизор</strong><small>Линия включена</small></div></div>
+            <div class="diagram-branch active" id="diagram-kettle"><span class="branch-line"></span><div class="branch-load"><i class="line-state on"></i><span>🫖</span><strong>Чайник</strong><small>Линия включена</small></div></div>
+            <div class="diagram-branch active" id="diagram-conditioner"><span class="branch-line"></span><div class="branch-load"><i class="line-state on"></i><span>❄️</span><strong>Кондиционер</strong><small>Линия включена</small></div></div>
+            <div class="diagram-branch active" id="diagram-custom"><span class="branch-line"></span><div class="branch-load"><i class="line-state on"></i><span>🔌</span><strong>Свои нагрузки</strong><small>Нет включённых приборов</small></div></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel loads-panel" id="loads">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Дистанционное управление</p>
+            <h2>Управление нагрузками</h2>
+          </div>
+          <button class="button button-secondary add-custom-load" id="addCustomLoadButton" type="button" aria-expanded="false" aria-controls="customLoadForm">+ Добавить свою нагрузку</button>
+        </div>
+        <div class="load-list">
+          <article class="load-card" data-load-card="lighting">
+            <div class="load-symbol">💡</div>
+            <div class="load-info"><strong>Освещение</strong><small>100 Вт</small><span><i class="load-indicator"></i><span class="load-status-text">Отключено</span></span></div>
+            <button class="load-toggle" type="button" data-load="lighting" aria-pressed="false"><span></span><em>ВЫКЛ</em></button>
+          </article>
+          <article class="load-card" data-load-card="computer">
+            <div class="load-symbol">💻</div>
+            <div class="load-info"><strong>Компьютер</strong><small>500 Вт</small><span><i class="load-indicator"></i><span class="load-status-text">Отключено</span></span></div>
+            <button class="load-toggle" type="button" data-load="computer" aria-pressed="false"><span></span><em>ВЫКЛ</em></button>
+          </article>
+          <article class="load-card" data-load-card="television">
+            <div class="load-symbol">📺</div>
+            <div class="load-info"><strong>Телевизор</strong><small>150 Вт</small><span><i class="load-indicator"></i><span class="load-status-text">Отключено</span></span></div>
+            <button class="load-toggle" type="button" data-load="television" aria-pressed="false"><span></span><em>ВЫКЛ</em></button>
+          </article>
+          <article class="load-card" data-load-card="kettle">
+            <div class="load-symbol">🫖</div>
+            <div class="load-info"><strong>Чайник</strong><small>2000 Вт</small><span><i class="load-indicator"></i><span class="load-status-text">Отключено</span></span></div>
+            <button class="load-toggle" type="button" data-load="kettle" aria-pressed="false"><span></span><em>ВЫКЛ</em></button>
+          </article>
+          <article class="load-card" data-load-card="conditioner">
+            <div class="load-symbol">❄️</div>
+            <div class="load-info"><strong>Кондиционер</strong><small>1500 Вт</small><span><i class="load-indicator"></i><span class="load-status-text">Отключено</span></span></div>
+            <button class="load-toggle" type="button" data-load="conditioner" aria-pressed="false"><span></span><em>ВЫКЛ</em></button>
+          </article>
+        </div>
+
+        <div class="custom-loads-section">
+          <div class="custom-loads-heading">
+            <div><strong>Свои нагрузки</strong><small>Добавьте один или несколько пользовательских приборов</small></div>
+          </div>
+
+          <form class="custom-load-form" id="customLoadForm" novalidate hidden>
+            <div class="custom-load-form-title"><span aria-hidden="true">🔌</span><strong id="customLoadFormTitle">СВОЯ НАГРУЗКА</strong></div>
+            <div class="custom-load-fields">
+              <label class="custom-load-field"><span>Название прибора</span><input id="customLoadName" type="text" maxlength="80" autocomplete="off" placeholder="Насос"><small id="customLoadNameError"></small></label>
+              <label class="custom-load-field"><span>Мощность</span><span class="custom-input-with-unit"><input id="customLoadPower" type="number" min="0" max="1000000" step="1" inputmode="decimal" value="1500"><i>Вт</i></span><small id="customLoadPowerError"></small></label>
+              <label class="custom-load-field"><span>cosφ</span><input id="customLoadPowerFactor" type="number" min="0" max="1" step="0.01" inputmode="decimal" value="0.85"><small id="customLoadPowerFactorError"></small></label>
+              <label class="custom-load-field"><span>Количество</span><input id="customLoadQuantity" type="number" min="1" max="10000" step="1" inputmode="numeric" value="1"><small id="customLoadQuantityError"></small></label>
+            </div>
+            <label class="custom-load-start-state" id="customLoadStartState"><input id="customLoadEnabled" type="checkbox"><span>Включить нагрузку сразу после добавления</span></label>
+            <div class="custom-load-form-actions">
+              <button class="button button-primary" id="customLoadSubmit" type="submit">Добавить</button>
+              <button class="button button-secondary" id="cancelCustomLoad" type="button">Отмена</button>
+            </div>
+          </form>
+
+          <div class="custom-loads-list" id="customLoadsList" aria-live="polite"></div>
+        </div>
+        <p class="panel-footnote">Переключатели управляют только учебной симуляцией и не подключены к реальному оборудованию.</p>
+      </article>
+    </section>
+
+    <section class="section-shell real-alarms" data-app-page="monitoring" data-real-only hidden>
+      <article class="panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">События устройства</p><h2>Аварии REAL</h2></div>
+          <span class="read-only-badge">Только данные backend</span>
+        </div>
+        <div id="realAlarmList" class="real-alarm-list" aria-live="polite">
+          <p>⚠ Потеря связи — устройство не подключено.</p>
+        </div>
+        <p class="panel-footnote">Симуляционные сценарии EnergyLab сюда не попадают. В будущем список будет заполняться только событиями реального устройства.</p>
+      </article>
+    </section>
+
+    <section class="section-shell" id="events" data-app-page="monitoring" data-simulation-only hidden>
+      <article class="panel event-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">История системы</p>
+            <h2>Журнал событий</h2>
+          </div>
+          <button class="text-button" id="clearEvents" type="button">Очистить журнал</button>
+        </div>
+        <ol class="event-list" id="eventList" aria-live="polite"></ol>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer section-shell" data-app-page="monitoring" hidden>
+    <p id="monitoringFooterText">SMART ENERGY — учебный симулятор. Отображаемые значения не являются реальными измерениями и не предназначены для промышленной защиты или управления.</p>
+    <span>HTML · CSS · JavaScript</span>
+  </footer>
+
+  <nav class="bottom-navigation" id="bottomNavigation" aria-label="Основные разделы">
+    <a href="#home" data-app-nav="home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z"></path></svg><span>Главная</span></a>
+    <a href="#monitoring" data-app-nav="monitoring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-7 4 14 2-7h6"></path></svg><span>Монитор.</span></a>
+    <a href="./calculators/index.html" data-app-nav="calculators"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M8 6h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h2m4 0h2"></path></svg><span>Расчёты</span></a>
+    <a href="#energy-lab" data-app-nav="energy-lab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6m-5 0v5l-5 9a3 3 0 0 0 2.6 4.5h8.8A3 3 0 0 0 19 17l-5-9V3"></path><path d="M8 15h8"></path></svg><span>EnergyLab</span></a>
+    <a href="./solar-lab/index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"></circle><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><span>Solar</span></a>
+  </nav>
+
+  <script src="lib/complex.js?v=20261014-1"></script>
+  <script src="lib/calculations.js?v=20261014-1"></script>
+  <script src="lib/measurement-model.js?v=20261018-1"></script>
+  <script src="services/real-device-api.js?v=20261018-1"></script>
+  <script src="script.js?v=20261018-1"></script>
+</body>
+</html>
